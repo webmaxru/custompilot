@@ -16,7 +16,7 @@ An interactive, simulated demo of the Copilot usage metrics API change announced
 |---|---|---|
 | Your skills, custom agents, MCP servers, plugins | grouped under `other` | reported by their **configured name** |
 | Your custom slash commands | grouped under `custom` | reported by their **configured name** |
-| Entries per `totals_by_*` list | top 5 | up to **25**, plus a trailing `other` (`custom` for slash commands) |
+| Entries per `totals_by_*` list | top 5 | up to **25**, plus a trailing `other` for remaining activity |
 | `interaction_count`, `distinct_*_use_count` | | unchanged |
 
 This affects `totals_by_skill`, `totals_by_custom_agent`, `totals_by_mcp`, `totals_by_slash_cmd` and `totals_by_plugin`

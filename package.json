@@ -1,0 +1,17 @@
+{
+  "name": "custompilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive, simulated demo of named custom skills, agents, MCP servers, slash commands and plugins in the GitHub Copilot usage metrics API.",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test",
+    "samples": "node scripts/generate-samples.mjs",
+    "summarize": "node scripts/summarize.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

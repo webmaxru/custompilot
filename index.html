@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Custompilot · Named customizations in Copilot usage metrics (demo)</title>
+  <meta name="description" content="Interactive simulation of the Copilot usage metrics API change that reports the names of your custom skills, custom agents, MCP servers, slash commands and plugins.">
+  <meta property="og:title" content="Custompilot · Named customizations in Copilot usage metrics">
+  <meta property="og:description" content="See which of your skills, custom agents and MCP servers developers actually use. Interactive, simulated demo.">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1117'/%3E%3Ccircle cx='11' cy='15' r='5' fill='none' stroke='%233fb950' stroke-width='2.5'/%3E%3Ccircle cx='21' cy='15' r='5' fill='none' stroke='%23a371f7' stroke-width='2.5'/%3E%3Cpath d='M16 15h0' stroke='%23e6edf3' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Custompilot home">
+      <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><circle cx="11" cy="16" r="5.5" fill="none" stroke="var(--green)" stroke-width="2.5"/><circle cx="21" cy="16" r="5.5" fill="none" stroke="var(--purple)" stroke-width="2.5"/></svg>
+      <span>Custompilot</span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#compare">Before / after</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#adoption">Adoption</a>
+      <a href="#developers">Developers</a>
+      <a href="#api">API</a>
+      <a href="#names">Name rules</a>
+      <a href="#analyze">Your report</a>
+    </nav>
+    <a class="gh-link" href="https://github.com/webmaxru/custompilot" aria-label="Source on GitHub">
+      <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <p class="eyebrow">Copilot usage metrics API · <a href="https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/">Changelog, Oct 22 2026</a></p>
+      <h1>See which of <em>your</em> skills, agents and MCP servers developers actually use.</h1>
+      <p class="lead">Copilot usage metrics now report the configured names of the skills, custom agents, MCP servers, slash commands and plugins your organization creates, instead of grouping them under <code>other</code> or <code>custom</code>. This demo simulates 28 days of reports for the fictional org <code>contoso-eng</code>, spanning the release.</p>
+      <div class="whats-new">
+        <article>
+          <h2>Named entries</h2>
+          <p><code>totals_by_skill</code>, <code>totals_by_custom_agent</code>, <code>totals_by_mcp</code>, <code>totals_by_slash_cmd</code> and <code>totals_by_plugin</code> show the configured name, not <code>other</code> / <code>custom</code>.</p>
+        </article>
+        <article>
+          <h2>Up to 25 entries</h2>
+          <p>Each list now holds up to 25 entries per record (up from 5). Remaining activity goes into a trailing <code>other</code> entry.</p>
+        </article>
+        <article>
+          <h2>Unchanged counts</h2>
+          <p><code>interaction_count</code> and the <code>distinct_*_use_count</code> fields are calculated exactly as before.</p>
+        </article>
+      </div>
+      <p class="sim-banner" role="note"><strong>Simulation.</strong> Every number on this page is generated in your browser by a deterministic simulator (64 developers, 5 teams, Oct 8 – Nov 4 2026). No real API is called. Names appear from report day <strong>Oct 22</strong>; earlier days use the September format.</p>
+    </section>
+
+    <section id="compare" class="panel" aria-labelledby="compare-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="compare-title"><span class="step">1</span>Before / after: the same day, two report formats</h2>
+          <p class="muted">Pick a day and a category. Left: how the September release reported it. Right: how it is reported now.</p>
+        </div>
+        <div class="controls">
+          <div class="tabs" role="tablist" aria-label="Category" id="compare-tabs"></div>
+          <label class="select">Day <select id="compare-day"></select></label>
+        </div>
+      </div>
+      <div id="compare-summary" class="stat-strip"></div>
+      <div class="two-col">
+        <article class="card">
+          <header class="card-head"><span class="badge badge-muted">Sep 17 format</span><h3>Grouped under <code id="legacy-bucket">other</code>, top 5</h3></header>
+          <div id="compare-legacy"></div>
+        </article>
+        <article class="card card-accent">
+          <header class="card-head"><span class="badge badge-green">Oct 22 format</span><h3>Configured names, up to 25 + trailing <code>other</code></h3></header>
+          <div id="compare-named"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="dashboard" class="panel" aria-labelledby="dash-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="dash-title"><span class="step">2</span>Organization dashboard <span class="muted small">· <code>organization-28-day</code> report</span></h2>
+          <p class="muted" id="dash-sub"></p>
+        </div>
+        <div class="controls"><div class="tabs" role="tablist" aria-label="Category" id="dash-tabs"></div></div>
+      </div>
+      <div id="dash-kpis" class="kpis"></div>
+      <div class="two-col two-col-wide">
+        <article class="card">
+          <header class="card-head"><h3>Daily interactions: named vs grouped</h3></header>
+          <div id="dash-timeline" class="chart"></div>
+          <div class="legend"><span><i class="sw sw-named"></i>Reported by name</span><span><i class="sw sw-bucket"></i>Grouped (<code>other</code> / <code>custom</code>)</span></div>
+        </article>
+        <article class="card">
+          <header class="card-head"><h3 id="dash-board-title">Leaderboard since names appeared</h3></header>
+          <div id="dash-board" class="scroll"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="adoption" class="panel" aria-labelledby="adopt-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="adopt-title"><span class="step">3</span>Track adoption after a rollout</h2>
+          <p class="muted">Pick one of your customizations. Bars come from the aggregate reports; the line counts developers from the per-user reports.</p>
+        </div>
+        <div class="controls"><label class="select">Customization <select id="adopt-item"></select></label></div>
+      </div>
+      <p id="adopt-story" class="story"></p>
+      <div id="adopt-kpis" class="kpis"></div>
+      <div class="two-col two-col-wide">
+        <article class="card">
+          <header class="card-head"><h3>Daily usage</h3></header>
+          <div id="adopt-chart" class="chart"></div>
+          <div class="legend"><span><i class="sw sw-named"></i><code>interaction_count</code> (reported)</span><span><i class="sw sw-ghost"></i>Hidden inside <code>other</code> (simulated truth)</span><span><i class="sw sw-line"></i>Developers using it</span></div>
+        </article>
+        <article class="card">
+          <header class="card-head"><h3>Where to focus enablement</h3></header>
+          <div id="adopt-teams"></div>
+          <p class="muted small">Team = developers active since Oct 22 who used it at least once. Team membership is what you would join from the <code>user-teams-1-day</code> report.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="developers" class="panel" aria-labelledby="dev-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="dev-title"><span class="step">4</span>Per-user report <span class="muted small">· <code>users-1-day</code></span></h2>
+          <p class="muted" id="dev-sub"></p>
+        </div>
+        <div class="controls">
+          <label class="select">Day <select id="dev-day"></select></label>
+          <label class="select">Team <select id="dev-team"></select></label>
+          <label class="select">Search <input id="dev-search" type="search" placeholder="login or name" autocomplete="off"></label>
+        </div>
+      </div>
+      <div class="two-col dev-grid">
+        <div class="table-wrap"><table id="dev-table"></table></div>
+        <article class="card sticky">
+          <header class="card-head"><h3 id="dev-json-title">Raw record</h3></header>
+          <pre class="code" id="dev-json"></pre>
+        </article>
+      </div>
+    </section>
+
+    <section id="api" class="panel" aria-labelledby="api-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="api-title"><span class="step">5</span>Simulated API explorer</h2>
+          <p class="muted">Endpoints return signed download links; the report itself is an NDJSON file. Both steps are simulated here.</p>
+        </div>
+      </div>
+      <div class="api-grid">
+        <form class="card" id="api-form">
+          <fieldset>
+            <legend>Endpoint</legend>
+            <div id="api-endpoints" class="radio-list"></div>
+          </fieldset>
+          <label class="select block">day <select id="api-day"></select></label>
+          <button class="btn btn-primary" type="submit">Send request</button>
+        </form>
+        <div class="api-out">
+          <article class="card">
+            <header class="card-head"><span class="badge badge-muted">Step 1</span><h3>Request download links</h3></header>
+            <pre class="code" id="api-request"></pre>
+            <pre class="code" id="api-response"></pre>
+          </article>
+          <article class="card">
+            <header class="card-head"><span class="badge badge-muted">Step 2</span><h3>Download the report file</h3></header>
+            <p class="muted small" id="api-file-meta"></p>
+            <pre class="code tall" id="api-file"></pre>
+            <div class="btn-row">
+              <button class="btn" type="button" id="api-download">Download .ndjson</button>
+              <button class="btn" type="button" id="api-analyze">Analyze in section 7</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="names" class="panel" aria-labelledby="names-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="names-title"><span class="step">6</span>How a configured name is reported</h2>
+          <p class="muted">Names are trimmed and limited to 128 characters. Names that look like file paths stay grouped. <span class="small">(Path detection here is an approximation for the demo.)</span></p>
+        </div>
+      </div>
+      <div class="two-col">
+        <form class="card" id="names-form">
+          <label class="select block">Category <select id="names-cat"></select></label>
+          <label class="select block">Configured name <input id="names-input" type="text" autocomplete="off" spellcheck="false"></label>
+          <p class="muted small">Try:</p>
+          <div id="names-examples" class="chips"></div>
+        </form>
+        <article class="card" aria-live="polite">
+          <header class="card-head"><h3>Reported as</h3></header>
+          <div id="names-result"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="analyze" class="panel" aria-labelledby="an-title">
+      <div class="panel-head">
+        <div>
+          <h2 id="an-title"><span class="step">7</span>Analyze a report file</h2>
+          <p class="muted">Drop a real NDJSON report from the API (aggregate 1-day, 28-day, or per-user) or load a simulated one. Files are parsed locally in your browser and never uploaded.</p>
+        </div>
+      </div>
+      <div class="card">
+        <label class="dropzone" id="an-drop">
+          <input type="file" id="an-file" accept=".ndjson,.json,.jsonl,.txt,application/json">
+          <span><strong>Choose a file</strong> or drag it here</span>
+        </label>
+        <div class="btn-row">
+          <button class="btn" type="button" data-sample="org-28-day">Load simulated organization-28-day</button>
+          <button class="btn" type="button" data-sample="org-users-1-day">Load simulated users-1-day</button>
+          <button class="btn" type="button" data-sample="legacy">Load a pre-Oct 22 day (legacy format)</button>
+        </div>
+        <div id="an-out"></div>
+      </div>
+    </section>
+
+    <section id="notes" class="panel" aria-labelledby="notes-title">
+      <h2 id="notes-title">Good to know</h2>
+      <div class="notes">
+        <article><h3>Coverage</h3><p>Names come from Copilot CLI (interactive and prompt mode), the GitHub Copilot app, ACP integrations such as JetBrains, and the Copilot SDK. Prompt mode, the app and ACP need CLI 1.0.97+; the SDK needs v1.0.21+. IDE built-in chat telemetry does not report names.</p></article>
+        <article><h3>History</h3><p>Names appear for report days processed after the release. Earlier days still show <code>other</code> or <code>custom</code>, as in the dashboard above.</p></article>
+        <article><h3>Accuracy</h3><p>Metrics come from client telemetry and can undercount (outdated clients, blocked telemetry). Use them for trends and adoption, not exact accounting.</p></article>
+        <article><h3>Review before sharing</h3><p>Names are reported as configured. Review them before sharing reports outside your organization.</p></article>
+        <article><h3>Access</h3><p>Enterprise owners, billing managers, organization owners, or a custom role with “View Copilot Metrics”. The Copilot usage metrics policy must be enabled.</p></article>
+        <article><h3>Plugins ⊂ skills</h3><p>Plugin totals count only plugin skill invocations, so they are already included in skill totals. Don't add the two together.</p></article>
+      </div>
+      <div class="card try-real">
+        <h3>Try it on your real data</h3>
+        <p class="muted">The repo includes a zero-dependency Node script that fetches a report and lists your named customizations:</p>
+        <pre class="code">GITHUB_TOKEN=&lt;token with read:org&gt; node scripts/summarize.mjs --org YOUR_ORG --report organization-28-day</pre>
+        <p class="muted small">See the <a href="https://github.com/webmaxru/custompilot#readme">README</a> and the <a href="https://docs.github.com/rest/copilot/copilot-usage-metrics">Copilot usage metrics API docs</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Demo by <a href="https://github.com/webmaxru">@webmaxru</a> · Simulated data for a fictional organization · Not an official GitHub product · <a href="https://github.com/webmaxru/custompilot">Source</a></p>
+  </footer>
+</body>
+</html>

@@ -20,6 +20,7 @@
       <span>Custompilot</span>
     </a>
     <nav aria-label="Sections">
+      <a href="dashboard.html">Insights dashboard</a>
       <a href="#compare">Before / after</a>
       <a href="#dashboard">Dashboard</a>
       <a href="#adoption">Adoption</a>
@@ -38,6 +39,7 @@
       <p class="eyebrow">Copilot usage metrics API · <a href="https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/">Changelog, Oct 22 2026</a></p>
       <h1>See which of <em>your</em> skills, agents and MCP servers developers actually use.</h1>
       <p class="lead">Copilot usage metrics now report the configured names of the skills, custom agents, MCP servers, slash commands and plugins your organization creates, instead of grouping them under <code>other</code> or <code>custom</code>. This demo simulates 28 days of reports for the fictional org <code>contoso-eng</code>, spanning the release.</p>
+      <p class="dashboard-cta"><a class="btn" href="dashboard.html">Open the full insights dashboard &rarr;</a><span class="muted">Explore trends, adoption, and actionable insights with simulated or real reports.</span></p>
       <div class="whats-new">
         <article>
           <h2>Named entries</h2>
@@ -240,6 +242,17 @@
           <button class="btn" type="button" data-sample="org-users-1-day">Load simulated users-1-day</button>
           <button class="btn" type="button" data-sample="legacy">Load a pre-Oct 22 day (legacy format)</button>
         </div>
+        <details class="report-help" id="real-report-help" open>
+          <summary>How to get a real report file</summary>
+          <p>From a local clone of <a href="https://github.com/webmaxru/custompilot">this repository</a>, run the following in <strong>PowerShell</strong>. You need Node.js 20+ and GitHub CLI (<code>gh</code>) signed in to an account with Copilot metrics access.</p>
+          <pre class="code">$env:GITHUB_TOKEN = gh auth token
+node .\scripts\summarize.mjs --org YOUR_ORG --report organization-28-day --save .\copilot-report.ndjson</pre>
+          <p>Replace <code>YOUR_ORG</code> with your <strong>organization's login</strong>, not your personal username. The organization's usage metrics policy must be enabled, and your token needs appropriate permissions (<code>read:org</code> for classic tokens). Organization owners and roles with <strong>View Copilot Metrics</strong> can access these reports.</p>
+          <p>This saves <code>copilot-report.ndjson</code> in the current folder. Click <strong>Choose a file</strong> above and select it. The script requests signed download links, downloads every report part, and saves the actual NDJSON. <strong>Do not upload the JSON response containing <code>download_links</code>.</strong></p>
+          <p>For developer reach in the <a href="dashboard.html">full insights dashboard</a>, also download the matching per-user report and load both files together:</p>
+          <pre class="code">node .\scripts\summarize.mjs --org YOUR_ORG --report users-28-day --save .\copilot-users.ndjson</pre>
+          <p class="muted small">The aggregate 28-day report contains daily history. The per-user 28-day report contains period totals, not daily user history; reach is available only for its full reporting window. To analyze user reach over individual days, download <code>users-1-day</code> reports with <code>--day YYYY-MM-DD</code>. For enterprise reports, replace <code>--org YOUR_ORG --report organization-28-day</code> with <code>--enterprise YOUR_ENTERPRISE --report enterprise-28-day</code> and use a token with enterprise metrics access.</p>
+        </details>
         <div id="an-out"></div>
       </div>
     </section>
@@ -256,8 +269,7 @@
       </div>
       <div class="card try-real">
         <h3>Try it on your real data</h3>
-        <p class="muted">The repo includes a zero-dependency Node script that fetches a report and lists your named customizations:</p>
-        <pre class="code">GITHUB_TOKEN=&lt;token with read:org&gt; node scripts/summarize.mjs --org YOUR_ORG --report organization-28-day</pre>
+        <p class="muted">Follow the <a href="#real-report-help">real-report download instructions</a>, then open your files in the <a href="dashboard.html">insights dashboard</a> for trends, named activity, developer reach, and actionable insights.</p>
         <p class="muted small">See the <a href="https://github.com/webmaxru/custompilot#readme">README</a> and the <a href="https://docs.github.com/rest/copilot/copilot-usage-metrics">Copilot usage metrics API docs</a>.</p>
       </div>
     </section>

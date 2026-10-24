@@ -63,6 +63,8 @@ main { max-width: 1240px; margin: 0 auto; padding: 0 24px 48px; }
 .hero h1 { font-size: clamp(28px, 4.2vw, 46px); letter-spacing: -0.02em; max-width: 900px; }
 .hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--green), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .lead { font-size: 18px; color: #c9d1d9; max-width: 860px; margin: 16px 0 28px; }
+.dashboard-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 28px; }
+.dashboard-cta .btn { display: inline-block; border-color: var(--green); color: var(--green); text-decoration: none; }
 .whats-new { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .whats-new article { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
 .whats-new h2 { font-size: 16px; margin-bottom: 6px; }
@@ -242,6 +244,10 @@ select:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .an-grid .card { background: var(--bg); }
 .an-grid .scroll { max-height: 300px; }
 .error { color: var(--red); margin-top: 12px; }
+.report-help { margin-top: 20px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); }
+.report-help summary { cursor: pointer; font-weight: 600; color: var(--text); }
+.report-help p { font-size: 14px; }
+.report-help .code { max-height: none; }
 
 /* Notes */
 .notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }

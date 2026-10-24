@@ -2,6 +2,8 @@
 
 **Live demo: https://salnikov.no/custompilot/** (hosted on GitHub Pages; `webmaxru.github.io/custompilot/` redirects there)
 
+**Insights dashboard: https://salnikov.no/custompilot/dashboard.html**
+
 An interactive, simulated demo of the Copilot usage metrics API change announced on
 [Oct 22, 2026: *Custom skills, agents and MCP servers in usage metrics API*](https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/).
 
@@ -23,6 +25,18 @@ This affects `totals_by_skill`, `totals_by_custom_agent`, `totals_by_mcp`, `tota
 in the organization, enterprise and per-user reports.
 
 ## What's in the demo
+
+The separate **[insights dashboard](https://salnikov.no/custompilot/dashboard.html)** focuses on what you can build with named customization reports, rather than comparing API versions:
+
+- Portfolio activity, named coverage, observed developer reach, and recent-period comparisons.
+- Category/date filters, activity charts, an adoption heatmap, and a searchable, sortable inventory with per-item drilldowns.
+- Evidence-based suggestions for growing, newly observed, declining, and narrowly adopted customizations.
+- A clearly labeled simulation covering Oct 22 - Nov 4, plus local multi-file import of real NDJSON/JSON reports.
+- Downloadable simulated data, explicit coverage/error states, and no report uploads or browser-side authentication.
+
+Aggregate 1-day and 28-day reports provide activity history. Per-user 1-day files can provide both activity and reach; per-user 28-day files provide period totals and reach only for their exact reporting window. Load matching aggregate and per-user files together for both perspectives. Aggregate activity takes precedence, identical overlaps are deduplicated, and conflicting snapshots or mixed organization/enterprise scopes are rejected. Missing dates remain missing, not zero or simulated activity. Combined activity excludes plugins because their counts already appear in skills.
+
+The original explainer page includes:
 
 1. **Before / after**: the same simulated day rendered in the Sep 17 format and the Oct 22 format, with the customizations that were hidden inside `other`.
 2. **Organization dashboard**: an `organization-28-day` report. Shows the share of activity attributed by name, a daily timeline that crosses the Oct 22 cutover, and a leaderboard per category.
@@ -52,6 +66,16 @@ node scripts/summarize.mjs --file sample-data/organization-28-day.ndjson
 
 On PowerShell, set the token with `$env:GITHUB_TOKEN = "<token>"` first. Use `--json` for machine-readable output and `--help` for all options.
 The script sends your token only to the API. It does not send it to the signed download links.
+
+To download files for the dashboard with an authenticated GitHub CLI, run these commands in PowerShell from the repository folder:
+
+```powershell
+$env:GITHUB_TOKEN = gh auth token
+node .\scripts\summarize.mjs --org YOUR_ORG --report organization-28-day --save .\copilot-report.ndjson
+node .\scripts\summarize.mjs --org YOUR_ORG --report users-28-day --save .\copilot-users.ndjson
+```
+
+Select both saved files using **Load report files** on the dashboard. They must cover the same organization and reporting window to provide full-window reach. Use `users-1-day` with `--day YYYY-MM-DD` for date-specific user reach. Upload the saved NDJSON reports, not the API's JSON response containing `download_links`. The same instructions are available on the [website](https://salnikov.no/custompilot/#real-report-help).
 
 Example output (simulated data, `--top 2`):
 
@@ -83,6 +107,10 @@ npm run samples  # regenerate sample-data/*.ndjson from the simulator
 index.html, css/, js/app.js   the demo page
 js/sim.js                     deterministic simulator: org, users, catalog, both report formats, simulated API
 js/report.js                  report reader shared by the page and the CLI (NDJSON parsing, totals)
+dashboard.html                standalone insights dashboard
+css/dashboard.css             dashboard-specific responsive styling
+js/dashboard.js               charts, filters, imports, heatmap, inventory and item drilldowns
+js/dashboard-data.js          validated report ingestion, coverage-aware metrics and actionable insights
 scripts/summarize.mjs         CLI for real reports
 scripts/generate-samples.mjs  writes sample-data/
 scripts/serve.mjs             tiny static server for local development

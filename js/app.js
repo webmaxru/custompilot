@@ -147,7 +147,7 @@ function timelineSvg(series, { ghost = null, line = null, lineLabel = '', launch
   const maxY = niceMax(Math.max(1, ...series.map((s) => s.named + s.bucket), ...(ghost ?? []).map((v) => v ?? 0)));
   const y = (v) => T + ih - (v / maxY) * ih;
   const out = [];
-  out.push(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily chart"><defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#484f58"/><rect width="3" height="6" fill="#6e7681"/></pattern></defs>`);
+  out.push(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily chart"><defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="var(--hatch-bg)"/><rect width="3" height="6" fill="var(--hatch)"/></pattern></defs>`);
   out.push(`<rect class="pre" x="${L}" y="${T}" width="${CUT * slot}" height="${ih}"/>`);
   for (let i = 0; i <= 4; i++) {
     const v = (maxY / 4) * i;
@@ -181,7 +181,7 @@ function timelineSvg(series, { ghost = null, line = null, lineLabel = '', launch
     }
     for (let i = 0; i <= 4; i += 2) {
       const v = (lmax / 4) * i;
-      out.push(`<text x="${W - R + 6}" y="${ly(v) + 4}" fill="#a371f7">${num(Math.round(v))}</text>`);
+      out.push(`<text x="${W - R + 6}" y="${ly(v) + 4}" fill="var(--purple)">${num(Math.round(v))}</text>`);
     }
   }
   out.push('</svg>');

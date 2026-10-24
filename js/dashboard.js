@@ -11,7 +11,7 @@ const num = (value) => number.format(value);
 const shortDate = (day) => dateFormatter.format(new Date(`${day}T00:00:00Z`));
 const rangeLabel = (from, to) => from === to ? shortDate(from) : `${shortDate(from)} \u2013 ${shortDate(to)}`;
 const DASH = '\u2014';
-const COLORS = { skill: '#5ce0b2', custom_agent: '#b39aff', mcp: '#6eb8ff', slash_cmd: '#edc36d', plugin: '#ed9dc5' };
+const COLORS = { skill: 'var(--dash-green)', custom_agent: 'var(--dash-purple)', mcp: 'var(--dash-blue)', slash_cmd: 'var(--dash-amber)', plugin: 'var(--dash-pink)' };
 const PAGE_SIZE = 12;
 const state = { data: null, view: null, category: 'all', from: '', to: '', chartMode: 'category', query: '', momentum: 'all', sort: 'count', direction: -1, page: 0, grouped: false };
 let importSequence = 0;
@@ -52,7 +52,7 @@ function sparkline(values, color) {
     } else segment.push(`${values.length === 1 ? 58 : 2 + i / (values.length - 1) * 112},${28 - value / max * 24}`);
   });
   if (segment.length) segments.push(segment);
-  return `<svg class="sparkline" viewBox="0 0 116 32" aria-hidden="true"><path d="M2 28H114" stroke="#27384e" fill="none"/>${segments.map((points) => points.length === 1
+  return `<svg class="sparkline" viewBox="0 0 116 32" aria-hidden="true"><path d="M2 28H114" stroke="var(--dash-line)" fill="none"/>${segments.map((points) => points.length === 1
     ? `<circle cx="${points[0].split(',')[0]}" cy="${points[0].split(',')[1]}" r="2" fill="${color}"/>`
     : `<polyline points="${points.join(' ')}" stroke="${color}" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
 }
@@ -88,7 +88,7 @@ function barsSvg(points, segments, label) {
   const ticks = points.map((point, i) => i === 0 || i === points.length - 1 || i % Math.ceil(points.length / 6) === 0
     ? `<text class="axis-label" x="${left + step * (i + 0.5)}" y="${height - 10}" text-anchor="middle">${esc(shortDate(point.day))}</text>` : '').join('');
   const table = `<div class="sr-only"><table><caption>${esc(label)}</caption><thead><tr><th>Date</th>${segments.map((part) => `<th>${esc(part.label)}</th>`).join('')}</tr></thead><tbody>${points.map((point) => `<tr><th>${point.day}</th>${segments.map((part) => `<td>${point.values[part.key] == null ? 'No data' : num(point.values[part.key])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><defs><pattern id="${pattern}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" x2="0" y1="0" y2="7" stroke="#526680" stroke-width="2" opacity="0.4"/></pattern></defs>${grid}${columns}${ticks}</svg>${table}`;
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><defs><pattern id="${pattern}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" x2="0" y1="0" y2="7" stroke="var(--dash-grouped)" stroke-width="2" opacity="0.4"/></pattern></defs>${grid}${columns}${ticks}</svg>${table}`;
 }
 
 function renderSource() {
@@ -143,7 +143,7 @@ function renderActivity() {
   const view = state.view;
   document.querySelectorAll('[data-chart-mode]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.chartMode === state.chartMode)));
   const parts = state.chartMode === 'attribution'
-    ? [{ key: 'named', label: 'Named activity', color: COLORS.skill }, { key: 'grouped', label: 'Grouped / unnamed', color: '#586a83' }]
+    ? [{ key: 'named', label: 'Named activity', color: COLORS.skill }, { key: 'grouped', label: 'Grouped / unnamed', color: 'var(--dash-grouped)' }]
     : view.keys.filter((key) => view.categories[key].present).map((key) => ({ key, label: CATEGORY_BY_KEY[key].label, color: COLORS[key] }));
   if (view.periodOnly) $('activity-chart').innerHTML = emptyVisual('Period totals, not daily history', 'Add the matching aggregate 28-day report or daily files to see a real activity timeline.', true);
   else if (!view.hasActivityData) $('activity-chart').innerHTML = emptyVisual('No daily data for this category', 'Choose another category or load reports containing its customization arrays.', true);
@@ -164,7 +164,7 @@ function renderMix() {
     key, label: CATEGORY_BY_KEY[key].label, color: COLORS[key], count: view.categories[key].total,
   })) : [
     { key: 'named', label: 'Reported by name', color: COLORS[state.category], count: view.named },
-    { key: 'grouped', label: 'Grouped / unnamed', color: '#465a74', count: view.grouped },
+    { key: 'grouped', label: 'Grouped / unnamed', color: 'var(--dash-grouped)', count: view.grouped },
   ];
   $('mix-title').textContent = all ? 'Activity mix' : 'Name coverage';
   const circumference = 2 * Math.PI * 78;
@@ -176,7 +176,7 @@ function renderMix() {
     return arc;
   }).join('');
   const value = !view.hasActivityData ? DASH : all ? compactNumber.format(view.activity) : view.namedShare == null ? DASH : `${Math.round(view.namedShare)}%`;
-  $('mix-chart').innerHTML = `<svg class="donut" viewBox="0 0 220 220" role="img" aria-label="${all ? 'Activity distribution by category' : 'Named versus grouped activity'}"><circle cx="110" cy="110" r="78" fill="none" stroke="#203048" stroke-width="21"/>${arcs}<text x="110" y="110" text-anchor="middle" class="donut-value">${esc(value)}</text><text x="110" y="130" text-anchor="middle" class="donut-label">${all ? 'activity signals' : 'attributed by name'}</text></svg>`;
+  $('mix-chart').innerHTML = `<svg class="donut" viewBox="0 0 220 220" role="img" aria-label="${all ? 'Activity distribution by category' : 'Named versus grouped activity'}"><circle cx="110" cy="110" r="78" fill="none" stroke="var(--dash-line)" stroke-width="21"/>${arcs}<text x="110" y="110" text-anchor="middle" class="donut-value">${esc(value)}</text><text x="110" y="130" text-anchor="middle" class="donut-label">${all ? 'activity signals' : 'attributed by name'}</text></svg>`;
   $('mix-legend').innerHTML = parts.map((part) => `<${all ? 'button type="button"' : 'div'} class="mix-row"${all ? ` data-category="${part.key}"` : ''}><i class="color-dot" style="--series-color:${part.color}"></i>${esc(part.label)}<strong>${num(part.count)}</strong><span class="mix-share">${view.activity ? Math.round(part.count / view.activity * 100) : 0}%</span></${all ? 'button' : 'div'}>`).join('')
     + `<p class="chart-footnote">${all ? 'Select a category to focus the dashboard. Plugin activity is already included in skills.' : 'Grouped activity can include unavailable names, path-like names, and overflow beyond the report cap.'}</p>`;
 }
@@ -210,7 +210,7 @@ function renderHeatmap() {
     const max = Math.max(1, ...item.points.filter((p) => p != null));
     const cells = item.points.map((count, i) => {
       const title = `${item.name}, ${view.days[i]}: ${count == null ? 'no report data' : count === 0 ? 'not listed; usage may be zero or outside the report cap' : `${num(count)} reported ${CATEGORY_BY_KEY[item.category].unit}`}`;
-      const color = count > 0 ? `${COLORS[item.category]}${Math.round((0.18 + count / max * 0.82) * 255).toString(16).padStart(2, '0')}` : '';
+      const color = count > 0 ? `color-mix(in srgb, ${COLORS[item.category]} ${18 + count / max * 82}%, transparent)` : '';
       return `<td${count == null ? ' class="heat-missing"' : ''}${color ? ` style="background:${color}"` : ''}><button class="heat-cell" type="button" data-item="${esc(item.id)}" title="${esc(title)}" aria-label="${esc(title)}"></button></td>`;
     }).join('');
     return `<tr><th scope="row"><button class="heat-name" type="button" data-item="${esc(item.id)}" title="${esc(item.name)}"><i class="color-dot" style="--series-color:${COLORS[item.category]}"></i><span>${esc(item.name)}</span></button></th>${cells}</tr>`;
@@ -276,7 +276,7 @@ function render() {
   const view = state.view;
   $('category-nav').innerHTML = [{ key: 'all', label: 'All customizations' }, ...CATEGORIES].map((cat) => {
     const count = cat.key === 'all' ? CATEGORIES.reduce((sum, c) => sum + view.categories[c.key].namedCount, 0) : view.categories[cat.key].namedCount;
-    return `<button class="category-focus" type="button" data-category="${cat.key}" aria-pressed="${state.category === cat.key}"><i class="color-dot" style="--series-color:${COLORS[cat.key] ?? '#9daec5'}"></i>${cat.label}<span class="category-count">${num(count)}</span></button>`;
+    return `<button class="category-focus" type="button" data-category="${cat.key}" aria-pressed="${state.category === cat.key}"><i class="color-dot" style="--series-color:${COLORS[cat.key] ?? 'var(--dash-muted)'}"></i>${cat.label}<span class="category-count">${num(count)}</span></button>`;
   }).join('');
   $('dashboard-category').value = state.category;
   $('view-context').textContent = `${rangeLabel(view.from, view.to)}, ${view.to.slice(0, 4)} \u00b7 ${view.days.length} day${view.days.length === 1 ? '' : 's'} \u00b7 ${state.category === 'all' ? 'All customization categories' : CATEGORY_BY_KEY[state.category].label}${view.periodOnly ? ' \u00b7 period totals only' : ''}`;

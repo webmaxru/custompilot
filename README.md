@@ -4,6 +4,8 @@
 
 **Insights dashboard: https://salnikov.no/custompilot/dashboard.html**
 
+Both pages offer a **Light / Dark / System** theme selector. System follows your device's appearance; explicit choices are saved locally and synchronized across pages and open tabs.
+
 An interactive, simulated demo of the Copilot usage metrics API change announced on
 [Oct 22, 2026: *Custom skills, agents and MCP servers in usage metrics API*](https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/).
 

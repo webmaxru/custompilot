@@ -43,8 +43,26 @@ function usersOn(di) {
 // ---------------------------------------------------------------------------
 // Shared rendering helpers
 // ---------------------------------------------------------------------------
-function dayOptions(selected) {
-  return S.DAYS.map((d) => `<option value="${d}"${d === selected ? ' selected' : ''}>${dayLong(d)}${d < S.NAMES_START_DAY ? ' · before names' : ''}</option>`).join('');
+function dayOptions(selected, showHistory = true) {
+  return S.DAYS.map((d) => `<option value="${d}"${d === selected ? ' selected' : ''}>${dayLong(d)}${showHistory && d < S.NAMES_START_DAY ? ' · before names' : ''}</option>`).join('');
+}
+
+function syncDayNavigation(id) {
+  const select = $(id);
+  $(`${id}-prev`).disabled = select.disabled || select.selectedIndex <= 0;
+  $(`${id}-next`).disabled = select.disabled || select.selectedIndex >= select.options.length - 1;
+}
+
+function wireDayNavigation(id) {
+  const select = $(id);
+  select.addEventListener('change', () => syncDayNavigation(id));
+  for (const [direction, step] of [['prev', -1], ['next', 1]]) {
+    $(`${id}-${direction}`).onclick = () => {
+      select.selectedIndex += step;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+  }
+  syncDayNavigation(id);
 }
 
 function renderTabs(el, current, onPick) {
@@ -401,6 +419,7 @@ function renderApiForm() {
 function syncApiDay() {
   const ep = S.ENDPOINTS.find((e) => e.id === state.endpoint);
   $('api-day').disabled = !ep.day;
+  syncDayNavigation('api-day');
 }
 
 function previewRecord(rec) {
@@ -512,7 +531,7 @@ function loadSample(kind) {
 function init() {
   const pickCompare = (k) => { state.compareCat = k; renderTabs($('compare-tabs'), k, pickCompare); renderCompare(); };
   renderTabs($('compare-tabs'), state.compareCat, pickCompare);
-  $('compare-day').innerHTML = dayOptions(state.compareDay);
+  $('compare-day').innerHTML = dayOptions(state.compareDay, false);
   $('compare-day').onchange = (e) => { state.compareDay = e.target.value; renderCompare(); };
 
   const pickDash = (k) => { state.dashCat = k; renderTabs($('dash-tabs'), k, pickDash); renderDashboard(); };
@@ -568,6 +587,7 @@ function init() {
     if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
   };
   document.querySelectorAll('[data-sample]').forEach((b) => { b.onclick = () => loadSample(b.dataset.sample); });
+  ['compare-day', 'dev-day', 'api-day'].forEach(wireDayNavigation);
 
   renderCompare();
   renderDashboard();

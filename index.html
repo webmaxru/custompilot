@@ -59,11 +59,18 @@
       <div class="panel-head">
         <div>
           <h2 id="compare-title"><span class="step">1</span>Before / after: the same day, two report formats</h2>
-          <p class="muted">Pick a day and a category. Left: how the September release reported it. Right: how it is reported now.</p>
+          <p class="muted">Pick a day and a category. Both columns use that day's activity: September format on the left, October format on the right. The date changes the activity, not the formats.</p>
         </div>
         <div class="controls">
           <div class="tabs" role="tablist" aria-label="Category" id="compare-tabs"></div>
-          <label class="select">Day <select id="compare-day"></select></label>
+          <div class="select day-picker">
+            <label for="compare-day">Day</label>
+            <div class="day-nav">
+              <button class="btn" type="button" id="compare-day-prev" aria-label="Previous day" aria-controls="compare-day" title="Previous day">&lt;</button>
+              <select id="compare-day"></select>
+              <button class="btn" type="button" id="compare-day-next" aria-label="Next day" aria-controls="compare-day" title="Next day">&gt;</button>
+            </div>
+          </div>
         </div>
       </div>
       <div id="compare-summary" class="stat-strip"></div>
@@ -132,7 +139,14 @@
           <p class="muted" id="dev-sub"></p>
         </div>
         <div class="controls">
-          <label class="select">Day <select id="dev-day"></select></label>
+          <div class="select day-picker">
+            <label for="dev-day">Day</label>
+            <div class="day-nav">
+              <button class="btn" type="button" id="dev-day-prev" aria-label="Previous day" aria-controls="dev-day" title="Previous day">&lt;</button>
+              <select id="dev-day"></select>
+              <button class="btn" type="button" id="dev-day-next" aria-label="Next day" aria-controls="dev-day" title="Next day">&gt;</button>
+            </div>
+          </div>
           <label class="select">Team <select id="dev-team"></select></label>
           <label class="select">Search <input id="dev-search" type="search" placeholder="login or name" autocomplete="off"></label>
         </div>
@@ -159,7 +173,14 @@
             <legend>Endpoint</legend>
             <div id="api-endpoints" class="radio-list"></div>
           </fieldset>
-          <label class="select block">day <select id="api-day"></select></label>
+          <div class="select block day-picker">
+            <label for="api-day">day</label>
+            <div class="day-nav">
+              <button class="btn" type="button" id="api-day-prev" aria-label="Previous day" aria-controls="api-day" title="Previous day">&lt;</button>
+              <select id="api-day"></select>
+              <button class="btn" type="button" id="api-day-next" aria-label="Next day" aria-controls="api-day" title="Next day">&gt;</button>
+            </div>
+          </div>
           <button class="btn btn-primary" type="submit">Send request</button>
         </form>
         <div class="api-out">

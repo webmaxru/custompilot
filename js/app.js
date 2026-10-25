@@ -1,5 +1,6 @@
 import * as S from './sim.js';
 import { CATEGORIES, CATEGORY_BY_KEY, collectTotals, parseReport, isBucket, pct } from './report.js';
+import { initSectionNavigation } from './navigation.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -66,10 +67,13 @@ function wireDayNavigation(id) {
 }
 
 function renderTabs(el, current, onPick) {
-  el.innerHTML = CATEGORIES.map((c) => `<button type="button" role="tab" data-cat="${c.key}" aria-selected="${c.key === current}">${c.label}</button>`).join('');
+  el.innerHTML = CATEGORIES.map((c) => `<button type="button" data-cat="${c.key}" aria-pressed="${c.key === current}">${c.label}</button>`).join('');
   el.onclick = (e) => {
     const b = e.target.closest('[data-cat]');
-    if (b) onPick(b.dataset.cat);
+    if (b) {
+      onPick(b.dataset.cat);
+      el.querySelector(`[data-cat="${b.dataset.cat}"]`).focus({ preventScroll: true });
+    }
   };
 }
 
@@ -184,7 +188,7 @@ function timelineSvg(series, { ghost = null, line = null, lineLabel = '', launch
       out.push(`<text x="${W - R + 6}" y="${ly(v) + 4}" fill="var(--purple)">${num(Math.round(v))}</text>`);
     }
   }
-  out.push('</svg>');
+  out.push(`</svg><details class="chart-data"><summary>View daily values</summary><div class="table-wrap" tabindex="0" role="region" aria-label="Daily chart values"><table><caption class="sr-only">Daily reported activity${line ? ' and developer reach' : ''}</caption><thead><tr><th scope="col">Day</th><th scope="col">Named</th><th scope="col">Grouped</th>${ghost ? '<th scope="col">Hidden (simulated)</th>' : ''}${line ? `<th scope="col">${esc(lineLabel)}</th>` : ''}</tr></thead><tbody>${series.map((s, i) => `<tr><th scope="row">${dayShort(s.day)}</th><td>${num(s.named)}</td><td>${num(s.bucket)}</td>${ghost ? `<td>${ghost[i] == null ? 'Not available' : num(ghost[i])}</td>` : ''}${line ? `<td>${line[i] == null ? 'Not available' : num(line[i])}</td>` : ''}</tr>`).join('')}</tbody></table></div></details>`);
   return out.join('');
 }
 
@@ -237,13 +241,13 @@ function renderCompare() {
     ? `<div class="hidden-list"><p>Inside <code>${cat.bucket}</code>: ${customItems.length} of your ${cat.label.toLowerCase()}, invisible in this format</p><div class="chips">${customItems.map(([nm, v]) => `<span class="chip">${esc(nm)} · ${v.n}</span>`).join('')}</div></div>`
     : '';
   const dropped = legacyDropped ? `<p class="note">${legacyDropped} more GitHub-provided ${legacyDropped === 1 ? 'entry was' : 'entries were'} cut by the top-5 limit.</p>` : '';
-  $('compare-legacy').innerHTML = `${barList(cat.key, toEntries(cat, legacy))}${dropped}${hidden}<pre class="code">${totalsJson(cat, distinct, legacy, false)}</pre>`;
+  $('compare-legacy').innerHTML = `${barList(cat.key, toEntries(cat, legacy))}${dropped}${hidden}<pre class="code" tabindex="0" aria-label="September format JSON">${totalsJson(cat, distinct, legacy, false)}</pre>`;
 
   const notes = [];
   if (bd.overflow.length) notes.push(`${bd.overflow.length} named ${bd.overflow.length === 1 ? 'item' : 'items'} beyond the 25-entry cap (${bd.overflow.map((o) => esc(o.name)).join(', ')}) folded into the trailing <code>other</code>.`);
   if (bd.pathLike.length) notes.push(`Path-like names stay grouped under <code>${cat.bucket}</code>: ${bd.pathLike.map((p) => `<code>${esc(p.name)}</code>`).join(', ')}.`);
   if (bd.unattributed) notes.push(`${bd.unattributed} ${cat.unit} came from clients older than CLI ${S.MIN_CLI_FOR_NAMES} (prompt mode / app / ACP), so they can't be named.`);
-  $('compare-named').innerHTML = `${barList(cat.key, toEntries(cat, named), { ranks: true })}${notes.map((t) => `<p class="note">${t}</p>`).join('')}<pre class="code">${totalsJson(cat, distinct, named, true)}</pre>`;
+  $('compare-named').innerHTML = `${barList(cat.key, toEntries(cat, named), { ranks: true })}${notes.map((t) => `<p class="note">${t}</p>`).join('')}<pre class="code" tabindex="0" aria-label="October format JSON">${totalsJson(cat, distinct, named, true)}</pre>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -257,6 +261,7 @@ function splitTotals(cat, record) {
 }
 
 function renderDashboard() {
+  $('dashboard-inventory-link').href = `dashboard.html?category=${state.dashCat}#inventory`;
   const days = aggDays();
   $('dash-sub').innerHTML = `${dayShort(S.DAYS[0])} – ${dayShort(S.WINDOW_END)} 2026 · ${days.length} <code>day_totals</code> · names reported from ${dayShort(S.NAMES_START_DAY)}`;
   $('dash-kpis').innerHTML = CATEGORIES.map((cat) => {
@@ -297,6 +302,7 @@ function renderAdoptionOptions() {
 }
 
 function renderAdoption() {
+  $('dashboard-adoption-link').href = `dashboard.html?category=${state.adoptItem.split(':')[0]}#rhythm`;
   const sep = state.adoptItem.indexOf(':');
   const catKey = state.adoptItem.slice(0, sep);
   const name = state.adoptItem.slice(sep + 1);
@@ -390,8 +396,8 @@ function renderDevelopers() {
   $('dev-table').innerHTML = `<thead><tr><th>Developer</th><th>CLI</th><th class="num" title="distinct_skill_use_count">Skills</th><th class="num" title="distinct_custom_agent_use_count">Agents</th><th class="num" title="distinct_mcp_use_count">MCP</th><th>Top agent (yours)</th><th>Top skill</th></tr></thead>
     <tbody>${rows.map((r) => {
       const u = USER_BY_LOGIN.get(r.user_login);
-      return `<tr data-login="${r.user_login}" aria-selected="${r.user_login === state.devSelected}">
-        <td><span class="mono">${r.user_login}</span><span class="team-chip">${u.team}</span></td>
+      return `<tr data-login="${r.user_login}">
+        <td><button class="record-button" type="button" data-login="${r.user_login}" aria-pressed="${r.user_login === state.devSelected}" aria-controls="dev-json">${r.user_login}</button><span class="team-chip">${u.team}</span></td>
         <td>${u.outdated ? `<span class="badge badge-warn" title="Older than ${S.MIN_CLI_FOR_NAMES}">${u.cli}</span>` : `<span class="mono">${u.cli}</span>`}</td>
         <td class="num">${r.distinct_skill_use_count}</td>
         <td class="num">${r.distinct_custom_agent_use_count}</td>
@@ -479,7 +485,7 @@ function renderNames() {
   $('names-result').innerHTML = `
     <span class="result-name ${r.named ? 'ok' : 'grouped'}">${esc(r.reported)}</span>
     <ul class="steps">${r.steps.map((s) => `<li class="${s.ok ? '' : 'bad'}">${esc(s.text)}</li>`).join('')}</ul>
-    <pre class="code">${entry}</pre>
+    <pre class="code" tabindex="0" aria-label="Reported name JSON">${entry}</pre>
     <p class="note">In the Sep 17 format this would have been reported as <code>${builtin ? esc(state.nameInput.trim()) : cat.bucket}</code>${builtin ? ' (GitHub-provided names were already shown)' : ''}.</p>`;
 }
 
@@ -502,7 +508,7 @@ function renderAnalysis(records, label) {
     const share = pct(c.namedTotal, c.total);
     return `<article class="card"><header class="card-head"><h3>${cat.label}</h3><span class="badge ${share > 50 ? 'badge-green' : 'badge-muted'}">${pctf(share)} named</span></header>
       <div class="kpi" style="margin-bottom:10px"><div class="meter"><i style="width:${share.toFixed(1)}%"></i></div><div class="sub">${plural(c.namedCount, 'named entry', 'named entries')} · ${num(c.total)} ${cat.unit}${c.distinctMax != null ? ` · max <code>${cat.distinct}</code> ${c.distinctMax}` : ''}</div></div>
-      <div class="scroll">${barList(cat.key, c.entries, { simTags: false, ranks: true })}</div></article>`;
+      <div class="scroll" tabindex="0" role="region" aria-label="${cat.label} report totals">${barList(cat.key, c.entries, { simTags: false, ranks: true })}</div></article>`;
   }).join('');
   const anyPresent = CATEGORIES.some((cat) => t.categories[cat.key].present);
   $('an-out').innerHTML = `<p class="note"><b>${esc(label)}</b> · ${KIND_LABEL[t.kind] ?? t.kind} · ${t.recordCount} record${t.recordCount === 1 ? '' : 's'}${t.dayCount ? ` · ${t.dayCount} day${t.dayCount === 1 ? '' : 's'}` : ''}${t.userCount ? ` · ${t.userCount} users` : ''}</p>
@@ -548,7 +554,12 @@ function init() {
   $('dev-search').oninput = (e) => { state.devQuery = e.target.value; renderDevelopers(); };
   $('dev-table').onclick = (e) => {
     const tr = e.target.closest('tr[data-login]');
-    if (tr) { state.devSelected = tr.dataset.login; renderDevelopers(); }
+    if (tr) {
+      const focused = e.target.closest('button');
+      state.devSelected = tr.dataset.login;
+      renderDevelopers();
+      if (focused) $('dev-table').querySelector(`button[data-login="${state.devSelected}"]`).focus({ preventScroll: true });
+    }
   };
 
   renderApiForm();
@@ -596,6 +607,7 @@ function init() {
   runApi();
   renderNames();
   loadSample('org-28-day');
+  initSectionNavigation();
 }
 
 init();

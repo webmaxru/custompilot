@@ -5,3 +5,5 @@ Thumbs.db
 .env
 copilot-report.ndjson
 copilot-users.ndjson
+test-results/
+playwright-report/

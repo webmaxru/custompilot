@@ -1,6 +1,7 @@
 import * as S from './sim.js';
 import { CATEGORIES, CATEGORY_BY_KEY } from './report.js';
 import { buildDashboardView, loadDashboardReports } from './dashboard-data.js';
+import { initSectionNavigation } from './navigation.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -40,23 +41,6 @@ function trendBadge(trend) {
   return `<span class="trend-badge ${trend.status}" title="${esc(`${rangeLabel(trend.recentFrom, trend.recentTo)}: ${num(trend.recent)}; ${rangeLabel(trend.previousFrom, trend.previousTo)}: ${num(trend.previous)}`)}">${esc(label)}</span>`;
 }
 
-function sparkline(values, color) {
-  if (!values.length || values.every((value) => value == null)) return `<span class="muted-dash">${DASH}</span>`;
-  const max = Math.max(1, ...values.filter((v) => v != null));
-  const segments = [];
-  let segment = [];
-  values.forEach((value, i) => {
-    if (value == null) {
-      if (segment.length) segments.push(segment);
-      segment = [];
-    } else segment.push(`${values.length === 1 ? 58 : 2 + i / (values.length - 1) * 112},${28 - value / max * 24}`);
-  });
-  if (segment.length) segments.push(segment);
-  return `<svg class="sparkline" viewBox="0 0 116 32" aria-hidden="true"><path d="M2 28H114" stroke="var(--dash-line)" fill="none"/>${segments.map((points) => points.length === 1
-    ? `<circle cx="${points[0].split(',')[0]}" cy="${points[0].split(',')[1]}" r="2" fill="${color}"/>`
-    : `<polyline points="${points.join(' ')}" stroke="${color}" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
-}
-
 function barsSvg(points, segments, label) {
   const width = 800;
   const height = 256;
@@ -87,7 +71,7 @@ function barsSvg(points, segments, label) {
   }).join('');
   const ticks = points.map((point, i) => i === 0 || i === points.length - 1 || i % Math.ceil(points.length / 6) === 0
     ? `<text class="axis-label" x="${left + step * (i + 0.5)}" y="${height - 10}" text-anchor="middle">${esc(shortDate(point.day))}</text>` : '').join('');
-  const table = `<div class="sr-only"><table><caption>${esc(label)}</caption><thead><tr><th>Date</th>${segments.map((part) => `<th>${esc(part.label)}</th>`).join('')}</tr></thead><tbody>${points.map((point) => `<tr><th>${point.day}</th>${segments.map((part) => `<td>${point.values[part.key] == null ? 'No data' : num(point.values[part.key])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const table = `<details class="chart-data"><summary>View daily values</summary><div class="table-wrap" tabindex="0" role="region" aria-label="${esc(label)} values"><table><caption class="sr-only">${esc(label)}</caption><thead><tr><th scope="col">Date</th>${segments.map((part) => `<th scope="col">${esc(part.label)}</th>`).join('')}</tr></thead><tbody>${points.map((point) => `<tr><th scope="row">${point.day}</th>${segments.map((part) => `<td>${point.values[part.key] == null ? 'No data' : num(point.values[part.key])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
   return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><defs><pattern id="${pattern}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" x2="0" y1="0" y2="7" stroke="var(--dash-grouped)" stroke-width="2" opacity="0.4"/></pattern></defs>${grid}${columns}${ticks}</svg>${table}`;
 }
 
@@ -99,8 +83,7 @@ function renderSource() {
   $('load-demo').setAttribute('aria-pressed', String(data.simulated));
   $('source-banner').innerHTML = `<span class="source-pill${data.simulated ? '' : ' local'}">${data.simulated ? 'SIMULATION' : 'LOCAL FILES'}</span>
     <span><strong>${esc(data.label)}</strong> &middot; ${esc(rangeLabel(data.from, data.to))}, ${data.to.slice(0, 4)}</span>
-    <span>${data.simulated ? 'Generated data for a fictional organization. No live API requests.' : `${data.files.length} file${data.files.length === 1 ? '' : 's'} analyzed locally; nothing uploaded.`}</span>
-    <button class="text-button source-action" type="button" data-open-import>${data.simulated ? 'Use your own reports' : 'Replace reports'} &rarr;</button>`;
+    <span>${data.simulated ? 'Generated data for a fictional organization. No live API requests.' : `${data.files.length} file${data.files.length === 1 ? '' : 's'} analyzed locally; nothing uploaded.`}</span>`;
   $('date-from').min = $('date-to').min = data.from;
   $('date-from').max = $('date-to').max = data.to;
   $('date-from').disabled = $('date-to').disabled = $('window-preset').disabled = data.periodOnly;
@@ -111,32 +94,32 @@ function renderMetrics() {
   const observed = view.reach.available;
   const metrics = [
     {
-      label: 'Reported activity', color: COLORS.skill,
+      label: 'Reported activity',
       value: view.hasActivityData ? num(view.activity) : DASH,
       note: state.category === 'all' ? 'Activity signals; plugins excluded' : CATEGORY_BY_KEY[state.category].unit,
       bottom: `${trendBadge(view.trend)}${view.trend ? `<span class="metric-detail">latest ${view.trend.size}d vs prior ${view.trend.size}d</span>` : ''}`,
     },
     {
-      label: 'Named customizations', color: COLORS.custom_agent,
+      label: 'Named customizations',
       value: num(view.namedItems.length),
       note: state.category === 'all' ? 'Across all five categories, including plugins' : 'Names with reported activity in this view',
       bottom: '<span class="metric-detail">Visible names, not a full installed inventory</span>',
     },
     {
-      label: 'Developers reached', color: COLORS.mcp,
+      label: 'Developers reached',
       value: observed ? `${num(view.reach.users)} <small>/ ${num(view.reach.population)}</small>` : DASH,
       note: observed ? 'Named activity / users in uploaded reports' : 'Per-user reports required',
       bottom: observed ? `<span class="metric-detail">${view.reach.mode === 'period' ? 'Exact full-window user summary' : `${view.reach.coveredDays}/${view.days.length} days with per-user records`}${view.reach.complete ? '' : ' \u00b7 partial coverage'}</span>`
         : '<button class="text-button" type="button" data-open-import>Add developer reach &rarr;</button>',
     },
     {
-      label: 'Activity attributed by name', color: COLORS.plugin,
+      label: 'Activity attributed by name',
       value: view.namedShare == null ? DASH : `${Math.round(view.namedShare)}<small>%</small>`,
       note: view.hasActivityData ? `${num(view.grouped)} activity signals grouped or unnamed` : 'Attribution data is unavailable',
       bottom: `<span class="metric-detail">${view.namedShare == null ? 'No activity denominator available' : 'Reporting visibility, not telemetry completeness'}</span>`,
     },
   ];
-  $('metric-cards').innerHTML = metrics.map((metric) => `<article class="metric-card" style="--metric-color:${metric.color}"><div class="metric-label">${metric.label}<span class="color-dot" style="--series-color:${metric.color}"></span></div><div class="metric-value">${metric.value}</div><div class="metric-note">${metric.note}</div><div class="metric-bottom">${metric.bottom}</div></article>`).join('');
+  $('metric-cards').innerHTML = metrics.map((metric) => `<article class="metric-card"><div class="metric-label">${metric.label}</div><div class="metric-value">${metric.value}</div><div class="metric-note">${metric.note}</div><div class="metric-bottom">${metric.bottom}</div></article>`).join('');
 }
 
 function renderActivity() {
@@ -166,18 +149,12 @@ function renderMix() {
     { key: 'named', label: 'Reported by name', color: COLORS[state.category], count: view.named },
     { key: 'grouped', label: 'Grouped / unnamed', color: 'var(--dash-grouped)', count: view.grouped },
   ];
-  $('mix-title').textContent = all ? 'Activity mix' : 'Name coverage';
-  const circumference = 2 * Math.PI * 78;
-  let offset = 0;
-  const arcs = parts.map((part) => {
-    const length = view.activity ? part.count / view.activity * circumference : 0;
-    const arc = `<circle cx="110" cy="110" r="78" fill="none" stroke="${part.color}" stroke-width="21" stroke-dasharray="${length} ${circumference - length}" stroke-dashoffset="${-offset}" transform="rotate(-90 110 110)"><title>${esc(part.label)}: ${num(part.count)}</title></circle>`;
-    offset += length;
-    return arc;
-  }).join('');
-  const value = !view.hasActivityData ? DASH : all ? compactNumber.format(view.activity) : view.namedShare == null ? DASH : `${Math.round(view.namedShare)}%`;
-  $('mix-chart').innerHTML = `<svg class="donut" viewBox="0 0 220 220" role="img" aria-label="${all ? 'Activity distribution by category' : 'Named versus grouped activity'}"><circle cx="110" cy="110" r="78" fill="none" stroke="var(--dash-line)" stroke-width="21"/>${arcs}<text x="110" y="110" text-anchor="middle" class="donut-value">${esc(value)}</text><text x="110" y="130" text-anchor="middle" class="donut-label">${all ? 'activity signals' : 'attributed by name'}</text></svg>`;
-  $('mix-legend').innerHTML = parts.map((part) => `<${all ? 'button type="button"' : 'div'} class="mix-row"${all ? ` data-category="${part.key}"` : ''}><i class="color-dot" style="--series-color:${part.color}"></i>${esc(part.label)}<strong>${num(part.count)}</strong><span class="mix-share">${view.activity ? Math.round(part.count / view.activity * 100) : 0}%</span></${all ? 'button' : 'div'}>`).join('')
+  $('mix-title').textContent = all ? 'Activity by category' : 'Name coverage';
+  $('mix-chart').innerHTML = `<p class="mix-summary">${all ? 'Share of combined reported activity' : 'Named and grouped activity in this category'}</p>`;
+  $('mix-legend').innerHTML = !view.hasActivityData ? emptyVisual('No activity data', 'Choose another category or load a report containing this category.') : parts.map((part) => {
+    const share = view.activity ? part.count / view.activity * 100 : 0;
+    return `<${all ? 'button type="button"' : 'div'} class="mix-row"${all ? ` data-category="${part.key}"` : ''}><span class="mix-label">${esc(part.label)}<strong>${num(part.count)}</strong><span class="mix-share">${Math.round(share)}%</span></span><span class="mix-track" aria-hidden="true"><i style="width:${share}%;--series-color:${part.color}"></i></span></${all ? 'button' : 'div'}>`;
+  }).join('')
     + `<p class="chart-footnote">${all ? 'Select a category to focus the dashboard. Plugin activity is already included in skills.' : 'Grouped activity can include unavailable names, path-like names, and overflow beyond the report cap.'}</p>`;
 }
 
@@ -185,7 +162,7 @@ function renderInsights() {
   $('insight-cards').innerHTML = state.view.insights.map((insight) => {
     const label = insight.itemId ? 'Inspect customization' : insight.id === 'coverage' ? 'Review coverage'
       : insight.id === 'steady' ? 'Explore inventory' : 'Load supporting reports';
-    return `<article class="insight-card ${insight.type}"><p class="signal-type">${insight.type === 'opportunity' ? 'Opportunity' : insight.type === 'watch' ? 'Worth investigating' : 'Data coverage'}</p><h3>${esc(insight.title)}</h3><p class="evidence">${esc(insight.evidence)}</p><p class="recommendation">${esc(insight.action)}</p><button class="text-button" type="button" data-insight="${insight.id}">${label} &rarr;</button></article>`;
+    return `<article class="insight-card"><h3>${esc(insight.title)}</h3><p class="evidence">${esc(insight.evidence)}</p><p class="recommendation">${esc(insight.action)}</p><button class="text-button" type="button" data-insight="${insight.id}">${label} &rarr;</button></article>`;
   }).join('');
 }
 
@@ -211,11 +188,11 @@ function renderHeatmap() {
     const cells = item.points.map((count, i) => {
       const title = `${item.name}, ${view.days[i]}: ${count == null ? 'no report data' : count === 0 ? 'not listed; usage may be zero or outside the report cap' : `${num(count)} reported ${CATEGORY_BY_KEY[item.category].unit}`}`;
       const color = count > 0 ? `color-mix(in srgb, ${COLORS[item.category]} ${18 + count / max * 82}%, transparent)` : '';
-      return `<td${count == null ? ' class="heat-missing"' : ''}${color ? ` style="background:${color}"` : ''}><button class="heat-cell" type="button" data-item="${esc(item.id)}" title="${esc(title)}" aria-label="${esc(title)}"></button></td>`;
+      return `<td${count == null ? ' class="heat-missing"' : ''}${color ? ` style="background:${color}"` : ''} title="${esc(title)}"><span class="heat-value" aria-hidden="true">${count == null ? DASH : num(count)}</span><span class="sr-only">${esc(title)}</span></td>`;
     }).join('');
     return `<tr><th scope="row"><button class="heat-name" type="button" data-item="${esc(item.id)}" title="${esc(item.name)}"><i class="color-dot" style="--series-color:${COLORS[item.category]}"></i><span>${esc(item.name)}</span></button></th>${cells}</tr>`;
   }).join('');
-  $('adoption-heatmap').innerHTML = `<table class="heatmap" style="min-width:${Math.max(580, 195 + view.days.length * 25)}px"><caption class="sr-only">Daily reported activity by customization</caption><thead><tr><th scope="col">Customization / day</th>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+  $('adoption-heatmap').innerHTML = `<table class="heatmap" style="min-width:${Math.max(580, 195 + view.days.length * 44)}px"><caption class="sr-only">Daily reported activity by customization</caption><thead><tr><th scope="col">Customization / day</th>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function renderInventory() {
@@ -245,7 +222,7 @@ function renderInventory() {
     <td><span class="activity-value">${num(item.count)}</span><span class="activity-unit">${CATEGORY_BY_KEY[item.category].unit}</span></td>
     <td>${trendBadge(item.trend)}${item.trend ? `<span class="table-sub">${item.trend.size}d vs prior ${item.trend.size}d</span>` : ''}</td>
     <td>${item.users == null ? `<span class="muted-dash" title="${item.bucket ? 'Grouped activity has no named-user attribution' : 'Load matching per-user records'}">${DASH}</span>` : `<span class="activity-value">${num(item.users.length)}</span><span class="table-sub">${view.reach.complete ? 'in uploaded reports' : 'partial date coverage'}</span>`}</td>
-    <td>${sparkline(item.points, COLORS[item.category])}</td>
+    <td><span class="activity-value">${view.periodOnly ? DASH : `${item.observedDays} / ${view.days.length}`}</span><span class="table-sub">${item.firstObserved ? `First listed ${esc(shortDate(item.firstObserved))}` : 'No daily history'}</span></td>
   </tr>`).join('') || `<tr><td colspan="5">${emptyVisual('No customizations match these filters', 'Try another name, category, or momentum filter.')}<button class="text-button" type="button" id="clear-inventory">Clear inventory filters</button></td></tr>`;
   $('inventory-page-label').textContent = rows.length ? `Showing ${state.page * PAGE_SIZE + 1}\u2013${Math.min(rows.length, (state.page + 1) * PAGE_SIZE)} of ${num(rows.length)} items` : 'No matching items';
   $('inventory-prev').disabled = state.page === 0;
@@ -461,7 +438,14 @@ function init() {
     if (!button) return;
     if (button.hasAttribute('data-open-import')) openImport();
     else if (button.hasAttribute('data-close-dialog')) button.closest('dialog').close();
-    else if (button.dataset.category) { $('dashboard-category').value = button.dataset.category; applyFilters(); }
+    else if (button.dataset.category) {
+      const container = button.closest('#category-nav, #mix-legend');
+      const category = button.dataset.category;
+      $('dashboard-category').value = category;
+      applyFilters();
+      const replacement = container?.querySelector(`[data-category="${category}"]`);
+      (replacement ?? $('dashboard-category')).focus({ preventScroll: true });
+    }
     else if (button.dataset.item) openItem(button.dataset.item);
     else if (button.dataset.chartMode) { state.chartMode = button.dataset.chartMode; renderActivity(); }
     else if (button.dataset.sort) {
@@ -478,6 +462,18 @@ function init() {
     } else if (button.id === 'clear-inventory') { resetInventory(); renderInventory(); }
   });
   loadDemo();
+  const category = new URLSearchParams(location.search).get('category');
+  if (category && (category === 'all' || CATEGORIES.some((cat) => cat.key === category))) {
+    $('dashboard-category').value = category;
+    applyFilters();
+  } else if (category) {
+    $('filter-error').textContent = 'The linked category is not recognized. Showing all customizations; choose a category above.';
+    $('filter-error').hidden = false;
+  }
+  const followLink = () => { if (location.hash === '#import') openImport(); };
+  window.addEventListener('hashchange', followLink);
+  followLink();
+  initSectionNavigation();
 }
 
 init();

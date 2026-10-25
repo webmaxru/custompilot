@@ -13,22 +13,16 @@
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/app.js"></script>
 </head>
-<body>
+<body class="demo-page">
   <a class="skip" href="#main">Skip to content</a>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Custompilot home">
       <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><circle cx="11" cy="16" r="5.5" fill="none" stroke="var(--green)" stroke-width="2.5"/><circle cx="21" cy="16" r="5.5" fill="none" stroke="var(--purple)" stroke-width="2.5"/></svg>
       <span>Custompilot</span>
     </a>
-    <nav aria-label="Sections">
-      <a href="dashboard.html">Insights dashboard</a>
-      <a href="#compare">Before / after</a>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#adoption">Adoption</a>
-      <a href="#developers">Developers</a>
-      <a href="#api">API</a>
-      <a href="#names">Name rules</a>
-      <a href="#analyze">Your report</a>
+    <nav class="page-switch" aria-label="Pages">
+      <a href="index.html" aria-current="page">Demo</a>
+      <a href="dashboard.html">Dashboard</a>
     </nav>
     <label class="theme-control"><span>Theme</span>
       <select data-theme-control aria-label="Color theme" autocomplete="off" disabled>
@@ -41,26 +35,31 @@
       <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
     </a>
   </header>
+  <nav class="section-nav" aria-label="Demo sections" data-section-nav>
+    <a href="#compare">Before / after</a>
+    <a href="#dashboard">Organization</a>
+    <a href="#adoption">Adoption</a>
+    <a href="#developers">Developers</a>
+    <a href="#api">API</a>
+    <a href="#names">Name rules</a>
+    <a href="#analyze">Your report</a>
+  </nav>
 
   <main id="main">
     <section class="hero" id="top">
-      <p class="eyebrow">Copilot usage metrics API · <a href="https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/">Changelog, Oct 22 2026</a></p>
-      <h1>See which of <em>your</em> skills, agents and MCP servers developers actually use.</h1>
-      <p class="lead">Copilot usage metrics now report the configured names of the skills, custom agents, MCP servers, slash commands and plugins your organization creates, instead of grouping them under <code>other</code> or <code>custom</code>. This demo simulates 28 days of reports for the fictional org <code>contoso-eng</code>, spanning the release.</p>
-      <p class="dashboard-cta"><a class="btn" href="dashboard.html">Open the full insights dashboard &rarr;</a><span class="muted">Explore trends, adoption, and actionable insights with simulated or real reports.</span></p>
-      <div class="whats-new">
-        <article>
-          <h2>Named entries</h2>
-          <p><code>totals_by_skill</code>, <code>totals_by_custom_agent</code>, <code>totals_by_mcp</code>, <code>totals_by_slash_cmd</code> and <code>totals_by_plugin</code> show the configured name, not <code>other</code> / <code>custom</code>.</p>
-        </article>
-        <article>
-          <h2>Up to 25 entries</h2>
-          <p>Each list now holds up to 25 entries per record (up from 5). Remaining activity goes into a trailing <code>other</code> entry.</p>
-        </article>
-        <article>
-          <h2>Unchanged counts</h2>
-          <p><code>interaction_count</code> and the <code>distinct_*_use_count</code> fields are calculated exactly as before.</p>
-        </article>
+      <div class="hero-copy">
+        <h1>Your customizations.<br>Now visible by name.</h1>
+        <p class="lead">See which skills, agents and MCP servers your developers use. Copilot usage metrics now report configured names instead of grouping your customizations under <code>other</code> or <code>custom</code>.</p>
+        <div class="dashboard-cta"><a class="btn btn-primary" href="#compare">Compare the formats</a><a href="dashboard.html">Explore the dashboard &rarr;</a></div>
+        <p class="release-link"><a href="https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/">API changelog &middot; October 22, 2026 &nearr;</a></p>
+      </div>
+      <div class="release-changes">
+        <h2>What changed in the report</h2>
+        <dl>
+          <div><dt>Configured names</dt><dd>Skills, custom agents, MCP servers, slash commands and plugins, identified in their <code>totals_by_*</code> lists.</dd></div>
+          <div><dt>5 &rarr; 25 entries</dt><dd>Up to 25 named entries per list, with remaining activity in a trailing <code>other</code> entry.</dd></div>
+          <div><dt>Same counts</dt><dd><code>interaction_count</code> and <code>distinct_*_use_count</code> are calculated as before.</dd></div>
+        </dl>
       </div>
       <p class="sim-banner" role="note"><strong>Simulation.</strong> Every number on this page is generated in your browser by a deterministic simulator (64 developers, 5 teams, Oct 8 – Nov 4 2026). No real API is called. Names appear from report day <strong>Oct 22</strong>; earlier days use the September format.</p>
     </section>
@@ -68,11 +67,11 @@
     <section id="compare" class="panel" aria-labelledby="compare-title">
       <div class="panel-head">
         <div>
-          <h2 id="compare-title"><span class="step">1</span>Before / after: the same day, two report formats</h2>
+          <h2 id="compare-title">One day. Two report formats.</h2>
           <p class="muted">Pick a day and a category. Both columns use that day's activity: September format on the left, October format on the right. The date changes the activity, not the formats.</p>
         </div>
         <div class="controls">
-          <div class="tabs" role="tablist" aria-label="Category" id="compare-tabs"></div>
+          <div class="tabs" role="group" aria-label="Comparison category" id="compare-tabs"></div>
           <div class="select day-picker">
             <label for="compare-day">Day</label>
             <div class="day-nav">
@@ -99,10 +98,10 @@
     <section id="dashboard" class="panel" aria-labelledby="dash-title">
       <div class="panel-head">
         <div>
-          <h2 id="dash-title"><span class="step">2</span>Organization dashboard <span class="muted small">· <code>organization-28-day</code> report</span></h2>
+          <h2 id="dash-title">Organization activity <span class="muted small">· <code>organization-28-day</code></span></h2>
           <p class="muted" id="dash-sub"></p>
         </div>
-        <div class="controls"><div class="tabs" role="tablist" aria-label="Category" id="dash-tabs"></div></div>
+        <div class="controls"><div class="tabs" role="group" aria-label="Organization category" id="dash-tabs"></div></div>
       </div>
       <div id="dash-kpis" class="kpis"></div>
       <div class="two-col two-col-wide">
@@ -113,15 +112,16 @@
         </article>
         <article class="card">
           <header class="card-head"><h3 id="dash-board-title">Leaderboard since names appeared</h3></header>
-          <div id="dash-board" class="scroll"></div>
+          <div id="dash-board" class="scroll" tabindex="0" role="region" aria-label="Category leaderboard"></div>
         </article>
       </div>
+      <p class="section-link"><a id="dashboard-inventory-link" href="dashboard.html?category=custom_agent#inventory">Inspect this category in the dashboard &rarr;</a></p>
     </section>
 
     <section id="adoption" class="panel" aria-labelledby="adopt-title">
       <div class="panel-head">
         <div>
-          <h2 id="adopt-title"><span class="step">3</span>Track adoption after a rollout</h2>
+          <h2 id="adopt-title">Track adoption after a rollout</h2>
           <p class="muted">Pick one of your customizations. Bars come from the aggregate reports; the line counts developers from the per-user reports.</p>
         </div>
         <div class="controls"><label class="select">Customization <select id="adopt-item"></select></label></div>
@@ -140,12 +140,13 @@
           <p class="muted small">Team = developers active since Oct 22 who used it at least once. Team membership is what you would join from the <code>user-teams-1-day</code> report.</p>
         </article>
       </div>
+      <p class="section-link"><a id="dashboard-adoption-link" href="dashboard.html?category=custom_agent#rhythm">Explore adoption across customizations &rarr;</a></p>
     </section>
 
     <section id="developers" class="panel" aria-labelledby="dev-title">
       <div class="panel-head">
         <div>
-          <h2 id="dev-title"><span class="step">4</span>Per-user report <span class="muted small">· <code>users-1-day</code></span></h2>
+          <h2 id="dev-title">Per-user report <span class="muted small">· <code>users-1-day</code></span></h2>
           <p class="muted" id="dev-sub"></p>
         </div>
         <div class="controls">
@@ -165,7 +166,7 @@
         <div class="table-wrap"><table id="dev-table"></table></div>
         <article class="card sticky">
           <header class="card-head"><h3 id="dev-json-title">Raw record</h3></header>
-          <pre class="code" id="dev-json"></pre>
+          <pre class="code" id="dev-json" tabindex="0" aria-label="Developer raw record"></pre>
         </article>
       </div>
     </section>
@@ -173,7 +174,7 @@
     <section id="api" class="panel" aria-labelledby="api-title">
       <div class="panel-head">
         <div>
-          <h2 id="api-title"><span class="step">5</span>Simulated API explorer</h2>
+          <h2 id="api-title">Simulated API explorer</h2>
           <p class="muted">Endpoints return signed download links; the report itself is an NDJSON file. Both steps are simulated here.</p>
         </div>
       </div>
@@ -196,16 +197,17 @@
         <div class="api-out">
           <article class="card">
             <header class="card-head"><span class="badge badge-muted">Step 1</span><h3>Request download links</h3></header>
-            <pre class="code" id="api-request"></pre>
-            <pre class="code" id="api-response"></pre>
+            <pre class="code" id="api-request" tabindex="0" aria-label="API request"></pre>
+            <pre class="code" id="api-response" tabindex="0" aria-label="API response"></pre>
           </article>
           <article class="card">
             <header class="card-head"><span class="badge badge-muted">Step 2</span><h3>Download the report file</h3></header>
             <p class="muted small" id="api-file-meta"></p>
-            <pre class="code tall" id="api-file"></pre>
+            <pre class="code tall" id="api-file" tabindex="0" aria-label="Report file preview"></pre>
             <div class="btn-row">
               <button class="btn" type="button" id="api-download">Download .ndjson</button>
-              <button class="btn" type="button" id="api-analyze">Analyze in section 7</button>
+              <button class="btn" type="button" id="api-analyze">Analyze this report</button>
+              <a class="btn" href="dashboard.html#import">Load reports in the dashboard &rarr;</a>
             </div>
           </article>
         </div>
@@ -215,7 +217,7 @@
     <section id="names" class="panel" aria-labelledby="names-title">
       <div class="panel-head">
         <div>
-          <h2 id="names-title"><span class="step">6</span>How a configured name is reported</h2>
+          <h2 id="names-title">How a configured name is reported</h2>
           <p class="muted">Names are trimmed and limited to 128 characters. Names that look like file paths stay grouped. <span class="small">(Path detection here is an approximation for the demo.)</span></p>
         </div>
       </div>
@@ -236,7 +238,7 @@
     <section id="analyze" class="panel" aria-labelledby="an-title">
       <div class="panel-head">
         <div>
-          <h2 id="an-title"><span class="step">7</span>Analyze a report file</h2>
+          <h2 id="an-title">Analyze a report file</h2>
           <p class="muted">Drop a real NDJSON report from the API (aggregate 1-day, 28-day, or per-user) or load a simulated one. Files are parsed locally in your browser and never uploaded.</p>
         </div>
       </div>
@@ -253,15 +255,16 @@
         <details class="report-help" id="real-report-help" open>
           <summary>How to get a real report file</summary>
           <p>From a local clone of <a href="https://github.com/webmaxru/custompilot">this repository</a>, run the following in <strong>PowerShell</strong>. You need Node.js 20+ and GitHub CLI (<code>gh</code>) signed in to an account with Copilot metrics access.</p>
-          <pre class="code">$env:GITHUB_TOKEN = gh auth token
+          <pre class="code" tabindex="0" aria-label="Download aggregate report commands">$env:GITHUB_TOKEN = gh auth token
 node .\scripts\summarize.mjs --org YOUR_ORG --report organization-28-day --save .\copilot-report.ndjson</pre>
           <p>Replace <code>YOUR_ORG</code> with your <strong>organization's login</strong>, not your personal username. The organization's usage metrics policy must be enabled, and your token needs appropriate permissions (<code>read:org</code> for classic tokens). Organization owners and roles with <strong>View Copilot Metrics</strong> can access these reports.</p>
           <p>This saves <code>copilot-report.ndjson</code> in the current folder. Click <strong>Choose a file</strong> above and select it. The script requests signed download links, downloads every report part, and saves the actual NDJSON. <strong>Do not upload the JSON response containing <code>download_links</code>.</strong></p>
           <p>For developer reach in the <a href="dashboard.html">full insights dashboard</a>, also download the matching per-user report and load both files together:</p>
-          <pre class="code">node .\scripts\summarize.mjs --org YOUR_ORG --report users-28-day --save .\copilot-users.ndjson</pre>
+          <pre class="code" tabindex="0" aria-label="Download per-user report command">node .\scripts\summarize.mjs --org YOUR_ORG --report users-28-day --save .\copilot-users.ndjson</pre>
           <p class="muted small">The aggregate 28-day report contains daily history. The per-user 28-day report contains period totals, not daily user history; reach is available only for its full reporting window. To analyze user reach over individual days, download <code>users-1-day</code> reports with <code>--day YYYY-MM-DD</code>. For enterprise reports, replace <code>--org YOUR_ORG --report organization-28-day</code> with <code>--enterprise YOUR_ENTERPRISE --report enterprise-28-day</code> and use a token with enterprise metrics access.</p>
         </details>
-        <div id="an-out"></div>
+        <p class="section-link">Need trends or developer reach? <a href="dashboard.html#import">Load matching files in the dashboard &rarr;</a> Files are not transferred between pages.</p>
+        <div id="an-out" aria-live="polite"></div>
       </div>
     </section>
 

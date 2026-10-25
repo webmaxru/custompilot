@@ -6,6 +6,10 @@
 
 Both pages offer a **Light / Dark / System** theme selector. System follows your device's appearance; explicit choices are saved locally and synchronized across pages and open tabs.
 
+The shared **Demo / Dashboard** navigation stays available on small screens. Contextual links from the demo's organization and adoption sections open the same category in the dashboard. Use `dashboard.html?category=skill#inventory` (or `custom_agent`, `mcp`, `slash_cmd`, `plugin`) to link to a filtered inventory; `dashboard.html#import` opens the local report loader. Report files are not transferred between pages.
+
+Both interfaces use the same neutral light/dark surfaces, green action color, and system typography. Chart colors distinguish categories, not decorative accents. Daily charts have expandable data tables, heatmaps show values without hover, and developer records can be selected with the keyboard. All sections remain accessible on mobile; wide data tables and charts scroll within their own regions.
+
 An interactive, simulated demo of the Copilot usage metrics API change announced on
 [Oct 22, 2026: *Custom skills, agents and MCP servers in usage metrics API*](https://github.blog/changelog/2026-10-22-custom-skills-agents-and-mcp-servers-in-usage-metrics-api/).
 
@@ -100,8 +104,15 @@ No build step. The site is plain HTML, CSS and ES modules.
 ```sh
 npm start        # http://localhost:8080 (set PORT to change)
 npm test         # node:test suite for the simulator, report reader and CLI
+npm run test:ui  # Playwright browser flows, responsive layouts, themes and axe accessibility checks
 npm run samples  # regenerate sample-data/*.ndjson from the simulator
 ```
+
+For browser checks, first run `npm ci` and `npx playwright install chromium`. The UI suite starts its own local server on port 8087 (or reuses one already running there) and covers 320px, 390px, 900px and 1440px layouts in light and dark themes. Screenshots and failing traces are written to the ignored `test-results/` directory. To run the same suite against a deployed site, set `UI_BASE_URL` to its URL, including a trailing slash.
+
+### Deployment
+
+GitHub Pages publishes the repository root from `main`. There is no production build or bundled runtime dependency. After `npm test` and `npm run test:ui` pass, fast-forward the reviewed change onto `main`, wait for the Pages build/deployment, and verify both live URLs. Do not force-push over concurrent changes.
 
 ## Project layout
 
@@ -117,6 +128,8 @@ scripts/summarize.mjs         CLI for real reports
 scripts/generate-samples.mjs  writes sample-data/
 scripts/serve.mjs             tiny static server for local development
 tests/                        node --test
+browser-tests/                browser interaction, accessibility and responsive checks
+js/navigation.js              shared in-page location tracking
 ```
 
 ## Good to know (from the changelog and docs)

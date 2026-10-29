@@ -61,14 +61,14 @@
           <div><dt>Same counts</dt><dd><code>interaction_count</code> and <code>distinct_*_use_count</code> are calculated as before.</dd></div>
         </dl>
       </div>
-      <p class="sim-banner" role="note"><strong>Simulation.</strong> Every number on this page is generated in your browser by a deterministic simulator (64 developers, 5 teams, Oct 8 – Nov 4 2026). No real API is called. Names appear from report day <strong>Oct 22</strong>; earlier days use the September format.</p>
+      <p class="sim-banner" role="note"><strong>Simulation.</strong> Every number on this page is generated in your browser by a deterministic simulator (64 developers, 5 teams, Oct 8 – Nov 4 2026). No real API is called. Names appear from report day <strong>Oct 22</strong>; earlier days use the legacy format.</p>
     </section>
 
     <section id="compare" class="panel" aria-labelledby="compare-title">
       <div class="panel-head">
         <div>
           <h2 id="compare-title">One day. Two report formats.</h2>
-          <p class="muted">Pick a day and a category. Both columns use that day's activity: September format on the left, October format on the right. The date changes the activity, not the formats.</p>
+          <p class="muted">Pick a day and a category. Both columns use that day's activity: the legacy format on the left, current format on the right. The date changes the activity, not the formats.</p>
         </div>
         <div class="controls">
           <div class="tabs" role="group" aria-label="Comparison category" id="compare-tabs"></div>
@@ -85,11 +85,11 @@
       <div id="compare-summary" class="stat-strip"></div>
       <div class="two-col">
         <article class="card">
-          <header class="card-head"><span class="badge badge-muted">Sep 17 format</span><h3>Grouped under <code id="legacy-bucket">other</code>, top 5</h3></header>
+          <header class="card-head"><span class="badge badge-muted">Legacy format</span><h3>Grouped under <code id="legacy-bucket">other</code>, top 5</h3></header>
           <div id="compare-legacy"></div>
         </article>
         <article class="card card-accent">
-          <header class="card-head"><span class="badge badge-green">Oct 22 format</span><h3>Configured names, up to 25 + trailing <code>other</code></h3></header>
+          <header class="card-head"><span class="badge badge-green">Current format</span><h3>Configured names, up to 25 + trailing <code>other</code></h3></header>
           <div id="compare-named"></div>
         </article>
       </div>
@@ -137,7 +137,7 @@
         <article class="card">
           <header class="card-head"><h3>Where to focus enablement</h3></header>
           <div id="adopt-teams"></div>
-          <p class="muted small">Team = developers active since Oct 22 who used it at least once. Team membership is what you would join from the <code>user-teams-1-day</code> report.</p>
+          <p class="muted small">Team = developers active since the current format began who used it at least once. Team membership is what you would join from the <code>user-teams-1-day</code> report.</p>
         </article>
       </div>
       <p class="section-link"><a id="dashboard-adoption-link" href="dashboard.html?category=custom_agent#rhythm">Explore adoption across customizations &rarr;</a></p>
@@ -250,7 +250,7 @@
         <div class="btn-row">
           <button class="btn" type="button" data-sample="org-28-day">Load simulated organization-28-day</button>
           <button class="btn" type="button" data-sample="org-users-1-day">Load simulated users-1-day</button>
-          <button class="btn" type="button" data-sample="legacy">Load a pre-Oct 22 day (legacy format)</button>
+          <button class="btn" type="button" data-sample="legacy">Load a legacy-format day</button>
         </div>
         <details class="report-help" id="real-report-help" open>
           <summary>How to get a real report file</summary>
@@ -288,6 +288,7 @@ node .\scripts\summarize.mjs --org YOUR_ORG --report organization-28-day --save 
 
   <footer class="footer">
     <p>Demo by <a href="https://github.com/webmaxru">@webmaxru</a> · Simulated data for a fictional organization · Not an official GitHub product · <a href="https://github.com/webmaxru/custompilot">Source</a></p>
+    <p>The current API format first appears in reports dated October 22, 2026; earlier reports use the legacy format.</p>
   </footer>
 </body>
 </html>

@@ -20,7 +20,7 @@ An interactive, simulated demo of the Copilot usage metrics API change announced
 
 ## What changed
 
-| | Before (Sep 17 format) | After (Oct 22) |
+| | Legacy format | Current format |
 |---|---|---|
 | Your skills, custom agents, MCP servers, plugins | grouped under `other` | reported by their **configured name** |
 | Your custom slash commands | grouped under `custom` | reported by their **configured name** |
@@ -44,8 +44,8 @@ Aggregate 1-day and 28-day reports provide activity history. Per-user 1-day file
 
 The original explainer page includes:
 
-1. **Before / after**: the same simulated day rendered in the Sep 17 format and the Oct 22 format, with the customizations that were hidden inside `other`.
-2. **Organization dashboard**: an `organization-28-day` report. Shows the share of activity attributed by name, a daily timeline that crosses the Oct 22 cutover, and a leaderboard per category.
+1. **Before / after**: the same simulated day rendered in the legacy and current formats, with the customizations that were hidden inside `other`.
+2. **Organization dashboard**: an `organization-28-day` report. Shows the share of activity attributed by name, a daily timeline across the format change, and a leaderboard per category.
 3. **Adoption tracking**: follow one customization after its rollout, and see which teams use it. Includes one item that launched before the cutover, so its first week is invisible.
 4. **Per-user report**: `users-1-day` records with each developer's top custom agent and skill, CLI version warnings, and the raw record.
 5. **Simulated API explorer**: all 8 organization and enterprise report endpoints. Shows the request, the signed-download-link response and the NDJSON file, which you can download.
@@ -95,7 +95,7 @@ Custom agents — 76% named · 14 named entries · 2,532 agent starts · max dis
        other (grouped)                                    602   23.8%
 ```
 
-In a 28-day report that spans the release, days before Oct 22 still show `other` / `custom`. That is why "named" is below 100% here.
+In a 28-day report that spans the release, days before Oct 22 still show `other` / `custom`. That is why "named" is below 100% here. The current format first appears in reports dated October 22, 2026; earlier reports use the legacy format.
 
 ## Run locally
 

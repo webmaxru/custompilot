@@ -169,8 +169,8 @@ function timelineSvg(series, { ghost = null, line = null, lineLabel = '', launch
   });
   out.push(`<line class="axis" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/>`);
   const cx = L + CUT * slot;
-  out.push(`<line class="cut" x1="${cx}" x2="${cx}" y1="${T - 18}" y2="${y(0)}"/><text class="cut-label" x="${cx + 6}" y="${T - 8}">Oct 22 · names reported →</text>`);
-  out.push(`<text x="${cx - 6}" y="${T - 8}" text-anchor="end">← Sep 17 format</text>`);
+  out.push(`<line class="cut" x1="${cx}" x2="${cx}" y1="${T - 18}" y2="${y(0)}"/><text class="cut-label" x="${cx + 6}" y="${T - 8}">Current format begins →</text>`);
+  out.push(`<text x="${cx - 6}" y="${T - 8}" text-anchor="end">← Legacy format</text>`);
   if (launchIdx != null && launchIdx >= 0) {
     const lx = L + launchIdx * slot + slot / 2;
     out.push(`<line class="launch" x1="${lx}" x2="${lx}" y1="${T + 4}" y2="${y(0)}"/><text class="launch-label" x="${lx + 5}" y="${T + 16}">${esc(launchLabel)}</text>`);
@@ -234,20 +234,20 @@ function renderCompare() {
   $('compare-summary').innerHTML = `
     <div class="stat"><b>${num(total)}</b><span>${cat.unit} on ${dayShort(state.compareDay)}</span></div>
     <div class="stat"><b>${distinct}</b><span><code>${cat.distinct}</code>, identical in both formats</span></div>
-    <div class="stat bad"><b>${pctf(pct(legacyBucket, total))}</b><span>grouped under <code>${cat.bucket}</code> in the Sep 17 format</span></div>
-    <div class="stat good"><b>${pctf(pct(namedNamed, total))}</b><span>attributed by name in the Oct 22 format</span></div>`;
+    <div class="stat bad"><b>${pctf(pct(legacyBucket, total))}</b><span>grouped under <code>${cat.bucket}</code> in the legacy format</span></div>
+    <div class="stat good"><b>${pctf(pct(namedNamed, total))}</b><span>attributed by name in the current format</span></div>`;
 
   const hidden = customItems.length
     ? `<div class="hidden-list"><p>Inside <code>${cat.bucket}</code>: ${customItems.length} of your ${cat.label.toLowerCase()}, invisible in this format</p><div class="chips">${customItems.map(([nm, v]) => `<span class="chip">${esc(nm)} · ${v.n}</span>`).join('')}</div></div>`
     : '';
   const dropped = legacyDropped ? `<p class="note">${legacyDropped} more GitHub-provided ${legacyDropped === 1 ? 'entry was' : 'entries were'} cut by the top-5 limit.</p>` : '';
-  $('compare-legacy').innerHTML = `${barList(cat.key, toEntries(cat, legacy))}${dropped}${hidden}<pre class="code" tabindex="0" aria-label="September format JSON">${totalsJson(cat, distinct, legacy, false)}</pre>`;
+  $('compare-legacy').innerHTML = `${barList(cat.key, toEntries(cat, legacy))}${dropped}${hidden}<pre class="code" tabindex="0" aria-label="Legacy format JSON">${totalsJson(cat, distinct, legacy, false)}</pre>`;
 
   const notes = [];
   if (bd.overflow.length) notes.push(`${bd.overflow.length} named ${bd.overflow.length === 1 ? 'item' : 'items'} beyond the 25-entry cap (${bd.overflow.map((o) => esc(o.name)).join(', ')}) folded into the trailing <code>other</code>.`);
   if (bd.pathLike.length) notes.push(`Path-like names stay grouped under <code>${cat.bucket}</code>: ${bd.pathLike.map((p) => `<code>${esc(p.name)}</code>`).join(', ')}.`);
   if (bd.unattributed) notes.push(`${bd.unattributed} ${cat.unit} came from clients older than CLI ${S.MIN_CLI_FOR_NAMES} (prompt mode / app / ACP), so they can't be named.`);
-  $('compare-named').innerHTML = `${barList(cat.key, toEntries(cat, named), { ranks: true })}${notes.map((t) => `<p class="note">${t}</p>`).join('')}<pre class="code" tabindex="0" aria-label="October format JSON">${totalsJson(cat, distinct, named, true)}</pre>`;
+  $('compare-named').innerHTML = `${barList(cat.key, toEntries(cat, named), { ranks: true })}${notes.map((t) => `<p class="note">${t}</p>`).join('')}<pre class="code" tabindex="0" aria-label="Current format JSON">${totalsJson(cat, distinct, named, true)}</pre>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -274,7 +274,7 @@ function renderDashboard() {
       <div class="label">${cat.label}</div>
       <div class="value">${pctf(share)}</div>
       <div class="meter"><i style="width:${share.toFixed(1)}%"></i></div>
-      <div class="sub">named since Oct 22 (was ${pctf(preShare)})</div></button>`;
+      <div class="sub">named since the current format began (was ${pctf(preShare)})</div></button>`;
   }).join('');
 
   const cat = CATEGORY_BY_KEY[state.dashCat];
@@ -343,10 +343,10 @@ function renderAdoption() {
 
   $('adopt-kpis').className = 'kpis k4';
   $('adopt-kpis').innerHTML = `
-    <div class="kpi"><div class="label">Reported since Oct 22</div><div class="value">${num(totalReported)}</div><div class="sub">${cat.unit}</div></div>
+    <div class="kpi"><div class="label">Reported since current format began</div><div class="value">${num(totalReported)}</div><div class="sub">${cat.unit}</div></div>
     <div class="kpi"><div class="label">Developers using it</div><div class="value">${adopters}</div><div class="sub">of ${activeTotal} active (${pctf(pct(adopters, activeTotal))})</div></div>
     <div class="kpi"><div class="label">Peak day</div><div class="value">${totalReported ? num(reported[peakIdx]) : '–'}</div><div class="sub">${totalReported ? dayLong(S.DAYS[peakIdx]) : 'no reported activity'}</div></div>
-    <div class="kpi"><div class="label">Hidden before Oct 22</div><div class="value">${hiddenTruth ? num(hiddenTruth) : '0'}</div><div class="sub">${hiddenTruth ? 'inside <code>other</code> (simulated truth)' : 'no earlier activity'}</div></div>`;
+    <div class="kpi"><div class="label">Hidden in legacy reports</div><div class="value">${hiddenTruth ? num(hiddenTruth) : '0'}</div><div class="sub">${hiddenTruth ? 'inside <code>other</code> (simulated truth)' : 'no earlier activity'}</div></div>`;
 
   $('adopt-chart').innerHTML = timelineSvg(series, {
     ghost,
@@ -389,7 +389,7 @@ function renderDevelopers() {
   const rows = recs.filter((r) => (state.devTeam === 'all' || USER_BY_LOGIN.get(r.user_login).team === state.devTeam) && (!q || r.user_login.includes(q)));
   const outdated = recs.filter((r) => USER_BY_LOGIN.get(r.user_login).outdated).length;
   const legacy = state.devDay < S.NAMES_START_DAY;
-  $('dev-sub').innerHTML = `${recs.length} developers active on ${dayLong(state.devDay)}${legacy ? ' · <span class="badge badge-warn">before names: Sep 17 format</span>' : ''} · ${outdated} on Copilot CLI older than ${S.MIN_CLI_FOR_NAMES}, where prompt-mode, app and ACP activity can't be named.`;
+  $('dev-sub').innerHTML = `${recs.length} developers active on ${dayLong(state.devDay)}${legacy ? ' · <span class="badge badge-warn">legacy format: names not reported</span>' : ''} · ${outdated} on Copilot CLI older than ${S.MIN_CLI_FOR_NAMES}, where prompt-mode, app and ACP activity can't be named.`;
   if (!rows.some((r) => r.user_login === state.devSelected)) state.devSelected = rows[0]?.user_login ?? null;
 
   const C = CATEGORY_BY_KEY;
@@ -486,7 +486,7 @@ function renderNames() {
     <span class="result-name ${r.named ? 'ok' : 'grouped'}">${esc(r.reported)}</span>
     <ul class="steps">${r.steps.map((s) => `<li class="${s.ok ? '' : 'bad'}">${esc(s.text)}</li>`).join('')}</ul>
     <pre class="code" tabindex="0" aria-label="Reported name JSON">${entry}</pre>
-    <p class="note">In the Sep 17 format this would have been reported as <code>${builtin ? esc(state.nameInput.trim()) : cat.bucket}</code>${builtin ? ' (GitHub-provided names were already shown)' : ''}.</p>`;
+    <p class="note">In the legacy format this would have been reported as <code>${builtin ? esc(state.nameInput.trim()) : cat.bucket}</code>${builtin ? ' (GitHub-provided names were already shown)' : ''}.</p>`;
 }
 
 // ---------------------------------------------------------------------------

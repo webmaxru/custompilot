@@ -45,7 +45,7 @@ test('named format: up to 25 named entries, trailing buckets, totals conserved',
   assert.ok(sawOverflow, 'simulation should exercise the 25-entry cap');
 });
 
-test('aggregate reports switch format on Oct 22 and keep distinct counts', () => {
+test('aggregate reports switch to current format on Oct 22 and keep distinct counts', () => {
   const before = S.buildAggregateDayRecord(S.NAMES_START_INDEX - 1);
   const after = S.buildAggregateDayRecord(S.NAMES_START_INDEX);
   assert.ok(before.totals_by_custom_agent.every((e) => S.isBuiltin('custom_agent', e.custom_agent) || e.custom_agent === 'other'));

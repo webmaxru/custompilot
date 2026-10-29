@@ -204,7 +204,7 @@ export function normalizeName(raw, catKey) {
 }
 
 // ---------------------------------------------------------------------------
-// Formatting: legacy (Sep 17) vs named (Oct 22) totals_by_* arrays.
+// Formatting: legacy vs current totals_by_* arrays.
 // usageMap: Map<rawName, { n: interactions, u: interactions whose name was not reported }>
 // ---------------------------------------------------------------------------
 function byCountThenName(field) {
